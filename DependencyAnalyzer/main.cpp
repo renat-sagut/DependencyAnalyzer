@@ -4,40 +4,41 @@ using namespace boost;
 namespace po = boost::program_options;
 
 #include <iostream>
+#include <sstream>
 #include <algorithm>
 #include <iterator>
+#include <io.h>
+#include <fcntl.h>
 
 using namespace std;
 
-
-// A helper function to simplify the main part.
-template<class T>
-ostream& operator<<(ostream& os, const vector<T>& v)
-{
-	copy(v.begin(), v.end(), ostream_iterator<T>(os, " "));
-	return os;
-}
-
-int main(int ac, char* av[])
+int wmain(int argc, wchar_t* argv[])
 {
 	try
 	{
+		_setmode(_fileno(stdout), _O_U16TEXT);
+
 		po::options_description desc("Allowed options");
 		desc.add_options()
 			("help", "produce help message")
-			("source-path", po::value<string>()->required(), "source path")
-			("include-path,I", po::value<vector<string>>(), "include path")
-			;
+			("source-path", po::wvalue<wstring>()->required(), "source path")
+			("include-path,I", po::wvalue<vector<wstring>>(), "include path");
 
 		po::positional_options_description p;
 		p.add("source-path", 1);
 
 		po::variables_map vm;
-		po::store(po::command_line_parser(ac, av).options(desc).positional(p).run(), vm);
+		po::store(po::basic_command_line_parser<wchar_t>(argc, argv).options(desc).positional(p).run(), vm);
 
-		if (vm.count("help")) {
-			cout << "Usage: options_description [options]\n";
-			cout << desc;
+		if (vm.count("help"))
+		{
+			stringstream ss;
+			ss << desc;
+			string str = std::move(ss.str());
+			wstring wdesc(str.begin(), str.end());
+
+			wcout << L"Usage: options_description [options]\n";
+			wcout << wdesc;
 			return 0;
 		}
 
@@ -45,17 +46,22 @@ int main(int ac, char* av[])
 
 		if (vm.count("source-path"))
 		{
-			cout << "Source path is: " << vm["source-path"].as< string >() << "\n";
+			wcout << L"Source path is: " << vm["source-path"].as<wstring>() << L"\n";
 		}
 
 		if (vm.count("include-path"))
 		{
-			cout << "Include paths are: " << vm["include-path"].as< vector<string> >() << "\n";
+			wcout << L"Include paths are: ";
+			for (auto const& path : vm["include-path"].as<vector<wstring>>())
+			{
+				wcout << path << L" ";
+			}
+			wcout << L"\n";
 		}
 	}
 	catch (std::exception& e)
 	{
-		cout << e.what() << "\n";
+		wcout << e.what() << "\n";
 		return 1;
 	}
 	return 0;
