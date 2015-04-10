@@ -13,10 +13,42 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\analyzer">
+      <UniqueIdentifier>{6d7f0034-5c06-426e-80d1-609e72ced0f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\analyzer">
+      <UniqueIdentifier>{abfb57f0-6c69-455a-bba5-156065c008e4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DependencyGraph.cpp">
+      <Filter>Source Files\analyzer</Filter>
+    </ClCompile>
+    <ClCompile Include="FileParser.cpp">
+      <Filter>Source Files\analyzer</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectoryTraverser.cpp">
+      <Filter>Source Files\analyzer</Filter>
+    </ClCompile>
+    <ClCompile Include="DependencyAnalyzer.cpp">
+      <Filter>Source Files\analyzer</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="DependencyGraph.h">
+      <Filter>Header Files\analyzer</Filter>
+    </ClInclude>
+    <ClInclude Include="FileParser.h">
+      <Filter>Header Files\analyzer</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectoryTraverser.h">
+      <Filter>Header Files\analyzer</Filter>
+    </ClInclude>
+    <ClInclude Include="DependencyAnalyzer.h">
+      <Filter>Header Files\analyzer</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
