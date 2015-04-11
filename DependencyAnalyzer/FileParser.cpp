@@ -87,7 +87,7 @@ namespace analyzer {
 	auto FileParser::removeComments(std::string& file) const -> void
 	{
 		std::string const matchComments(R"(\/\/.*)");
-		std::string const matchCommentsMultiLine(R"(\/\*(.*\n)*?\*\/)");
+		std::string const matchCommentsMultiLine(R"(\/\*(.*)*?(.*\n)*?\*\/)");
 
 		std::stringstream ss;
 		std::smatch matchResult;
@@ -97,19 +97,25 @@ namespace analyzer {
 		for (;;)
 		{
 			if (!std::regex_search(searchString, matchResult, regular))
+			{
+				ss << searchString;
 				break;
+			}
 
 			ss << matchResult.prefix();
 			searchString = matchResult.suffix().str();
 		}
 
 		searchString = std::move(ss.str());
-		ss.clear();
+		ss = std::stringstream();
 		regular = std::regex(matchCommentsMultiLine);
 		for (;;)
 		{
 			if (!std::regex_search(searchString, matchResult, regular))
+			{
+				ss << searchString;
 				break;
+			}
 
 			ss << matchResult.prefix();
 			searchString = matchResult.suffix().str();

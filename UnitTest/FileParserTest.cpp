@@ -12,15 +12,15 @@ namespace UnitTest
 		TEST_METHOD(removeComments)
 		{
 			std::string fileWithComments(
-				R"(#include "foo.h")"
-				R"(#include <test/aa.h>)"
-				R"(/*)"
-				R"(#include <c.h>)"
-				R"(*/)");
+				R"(#include "foo.h"\n)"
+				R"(#include <test/aa.h>\n)"
+				R"(/*\n)"
+				R"(#include <c.h>\n)"
+				R"(*/\n)");
 
 			std::string fileWithoutComments(
-				R"(#include "foo.h")"
-				R"(#include <test/aa.h>)");
+				R"(#include "foo.h"\n)"
+				R"(#include <test/aa.h>\n)");
 
 			FileParser parser;
 			std::string fileToProcess = fileWithComments;
