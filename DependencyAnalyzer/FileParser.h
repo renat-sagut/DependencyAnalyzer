@@ -27,7 +27,6 @@ namespace analyzer {
 
 		auto parseIncludes(std::string const& file) const -> IncludeList;
 
-	private:
 		auto findIncludeStrings(std::string const& inputString, IncludeType const includeType) const -> StringList;
 
 		auto extractFilePath(std::string const& includeString) const -> std::string;
@@ -35,6 +34,8 @@ namespace analyzer {
 		auto removeComments(std::string& file) const -> void;
 
 		auto parseIncludes(std::string const& file, IncludeType const includeType, IncludeList& includeList) const -> void;
+
+	private:
 
 	};
 }

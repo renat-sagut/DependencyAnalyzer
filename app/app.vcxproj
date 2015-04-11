@@ -11,13 +11,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{E87C7CB4-007F-46D6-8756-084DCD985EB0}</ProjectGuid>
+    <ProjectGuid>{CDE0675D-CE47-4803-8467-58D580633EC3}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>DependencyAnalyzer</RootNamespace>
+    <RootNamespace>app</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
@@ -53,7 +53,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>D:\boost_1_57_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\boost_1_57_0</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -80,16 +80,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="DependencyAnalyzer.cpp" />
-    <ClCompile Include="DependencyGraph.cpp" />
-    <ClCompile Include="DirectoryTraverser.cpp" />
-    <ClCompile Include="FileParser.cpp" />
+    <ProjectReference Include="..\DependencyAnalyzer\DependencyAnalyzer.vcxproj">
+      <Project>{e87c7cb4-007f-46d6-8756-084dcd985eb0}</Project>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="DependencyAnalyzer.h" />
-    <ClInclude Include="DependencyGraph.h" />
-    <ClInclude Include="DirectoryTraverser.h" />
-    <ClInclude Include="FileParser.h" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

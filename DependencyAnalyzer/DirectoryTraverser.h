@@ -15,7 +15,7 @@ namespace analyzer {
 
 		auto operator =(DirectoryTraverser const&) ->DirectoryTraverser& = delete;
 
-		auto getSourceFiles() const -> FilePathList;
+		auto findSourceFiles() const -> FilePathList;
 	private:
 	};
 }

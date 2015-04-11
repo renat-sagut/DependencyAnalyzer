@@ -2,7 +2,7 @@
 
 namespace analyzer {
 
-	auto DirectoryTraverser::getSourceFiles() const -> FilePathList
+	auto DirectoryTraverser::findSourceFiles() const -> FilePathList
 	{
 		return {};
 	}
