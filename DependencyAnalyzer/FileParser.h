@@ -7,7 +7,17 @@ namespace analyzer {
 	class FileParser final
 	{
 	public:
-		using DependencyList = std::vector<std::string>;
+		enum class IncludeType
+		{
+			BRACKETS,
+			QUOTES
+		};
+
+		using IncludeData = std::pair<std::string, IncludeType>;
+
+		using IncludeList = std::vector<IncludeData>;
+
+		using StringList = std::vector<std::string>;
 
 		FileParser();
 
@@ -15,8 +25,16 @@ namespace analyzer {
 
 		auto operator =(FileParser const&) -> FileParser& = delete;
 
-		auto getDependencies() const -> DependencyList;
+		auto parseIncludes(std::string const& file) const -> IncludeList;
+
 	private:
+		auto findIncludeStrings(std::string const& inputString, IncludeType const includeType) const -> StringList;
+
+		auto extractFilePath(std::string const& includeString) const -> std::string;
+
+		auto removeComments(std::string& file) const -> void;
+
+		auto parseIncludes(std::string const& file, IncludeType const includeType, IncludeList& includeList) const -> void;
 
 	};
 }
