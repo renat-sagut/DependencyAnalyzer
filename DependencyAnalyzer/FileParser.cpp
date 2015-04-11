@@ -10,17 +10,13 @@ namespace analyzer {
 
 	FileParser::FileParser() = default;
 
-	auto FileParser::parseIncludes(std::string const& file) const -> IncludeList
+	auto FileParser::parseIncludes(std::string const& file, IncludeList& bracketIncludes, IncludeList& quoteIncludes) const -> void
 	{
 		std::string parseFile = file;
 		removeComments(parseFile);
 
-		IncludeList includeList;
-
-		parseIncludes(parseFile, IncludeType::BRACKETS, includeList);
-		parseIncludes(parseFile, IncludeType::QUOTES, includeList);
-
-		return std::move(includeList);
+		parseIncludes(parseFile, IncludeType::BRACKETS, bracketIncludes);
+		parseIncludes(parseFile, IncludeType::QUOTES, quoteIncludes);
 	}
 
 	auto FileParser::parseIncludes(std::string const& file, IncludeType const includeType, IncludeList& includeList) const -> void
@@ -29,14 +25,14 @@ namespace analyzer {
 		for (auto const& includeString : includeStrings)
 		{
 			auto filePath = std::move(extractFilePath(includeString));
-			includeList.push_back({std::move(filePath), includeType});
+			includeList.push_back(std::move(filePath));
 		}
 	}
 
 	auto FileParser::findIncludeStrings(std::string const& inputString, IncludeType const includeType) const -> StringList
 	{
-		std::string const matchIncludesWithBrackets(R"(#include[[:space:]]*<.*>)");
-		std::string const matchIncludesWithQuotes(R"(#include[[:space:]]*".*")");
+		std::string const matchIncludesWithBrackets(R"(#include[[:space:]]*<.*?>)");
+		std::string const matchIncludesWithQuotes(R"(#include[[:space:]]*".*?")");
 
 		std::regex regular;
 
@@ -65,6 +61,7 @@ namespace analyzer {
 				break;
 
 			result.push_back(matchResult[0]);
+
 			searchString = matchResult.suffix().str();
 		}
 
@@ -86,42 +83,8 @@ namespace analyzer {
 
 	auto FileParser::removeComments(std::string& file) const -> void
 	{
-		std::string const matchComments(R"(\/\/.*)");
-		std::string const matchCommentsMultiLine(R"(\/\*(.*)*?(.*\n)*?\*\/)");
-
-		std::stringstream ss;
-		std::smatch matchResult;
-		std::string searchString = file;
-		std::regex regular(matchComments);
-		StringList result;
-		for (;;)
-		{
-			if (!std::regex_search(searchString, matchResult, regular))
-			{
-				ss << searchString;
-				break;
-			}
-
-			ss << matchResult.prefix();
-			searchString = matchResult.suffix().str();
-		}
-
-		searchString = std::move(ss.str());
-		ss = std::stringstream();
-		regular = std::regex(matchCommentsMultiLine);
-		for (;;)
-		{
-			if (!std::regex_search(searchString, matchResult, regular))
-			{
-				ss << searchString;
-				break;
-			}
-
-			ss << matchResult.prefix();
-			searchString = matchResult.suffix().str();
-		}
-
-		file = std::move(ss.str());
+		std::string matchComments(R"((/\*(.|[\r\n])*?\*/)|(//.*))");
+		file = std::regex_replace(file, std::regex(matchComments), "");
 	}
 
 }

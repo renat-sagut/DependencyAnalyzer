@@ -13,9 +13,7 @@ namespace analyzer {
 			QUOTES
 		};
 
-		using IncludeData = std::pair<std::string, IncludeType>;
-
-		using IncludeList = std::vector<IncludeData>;
+		using IncludeList = std::vector<std::string>;
 
 		using StringList = std::vector<std::string>;
 
@@ -25,7 +23,7 @@ namespace analyzer {
 
 		auto operator =(FileParser const&) -> FileParser& = delete;
 
-		auto parseIncludes(std::string const& file) const -> IncludeList;
+		auto parseIncludes(std::string const& file, IncludeList& bracketIncludes, IncludeList& quoteIncludes) const -> void;
 
 		auto findIncludeStrings(std::string const& inputString, IncludeType const includeType) const -> StringList;
 
