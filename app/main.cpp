@@ -69,8 +69,8 @@ int wmain(int argc, wchar_t* argv[])
 		DependencyAnalyzer analyzer;
 		analyzer.update(sourceDirectory, includeDirectories);
 
-		analyzer.printDependencyTree(cout);
-		analyzer.printIncludeFrequencies(cout);
+		analyzer.printDependencyTree(wcout);
+		analyzer.printIncludeFrequencies(wcout);
 	}
 	catch (std::exception& e)
 	{

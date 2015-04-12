@@ -45,9 +45,9 @@ namespace analyzer {
 
 		auto update(Path const& sourceFolder, PathList const& includeFolders) -> void;
 
-		auto printDependencyTree(std::ostream& out) -> void;
+		auto printDependencyTree(std::wostream& out) -> void;
 
-		auto printIncludeFrequencies(std::ostream& out) -> void;
+		auto printIncludeFrequencies(std::wostream& out) -> void;
 
 	private:
 		Path sourceDirectory;

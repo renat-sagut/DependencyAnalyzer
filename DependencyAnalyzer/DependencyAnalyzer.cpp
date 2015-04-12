@@ -5,15 +5,19 @@ using analyzer::DirectoryTraverser;
 #include "FileParser.h"
 using analyzer::FileParser;
 
+#include <boost/graph/topological_sort.hpp>
+
 #include <queue>
 #include <map>
 
 namespace analyzer {
 
-	auto DependencyAnalyzer::Vertex::operator =(Vertex const& v)->Vertex&
+	auto DependencyAnalyzer::Vertex::operator =(Vertex const& v) -> Vertex&
 	{
 		this->directory = v.directory;
 		this->relative = v.relative;
+
+		return *this;
 	}
 
 	auto DependencyAnalyzer::Vertex::operator ==(Vertex const& v) const -> bool
@@ -48,12 +52,18 @@ namespace analyzer {
 
 	DependencyAnalyzer::DependencyAnalyzer() = default;
 
-	auto DependencyAnalyzer::printDependencyTree(std::ostream& out) -> void
+	auto DependencyAnalyzer::printDependencyTree(std::wostream& out) -> void
 	{
+		std::list<VertexDescriptor> ordered;
+		boost::topological_sort(this->graph, std::front_inserter(ordered));
 
+		for (auto const v : ordered)
+		{
+			out << this->graph[v].toString() << std::endl;
+		}
 	}
 
-	auto DependencyAnalyzer::printIncludeFrequencies(std::ostream& out) -> void
+	auto DependencyAnalyzer::printIncludeFrequencies(std::wostream& out) -> void
 	{
 
 	}
@@ -115,7 +125,7 @@ namespace analyzer {
 				auto relative = std::move(traverser.findRelativePath(parent.relative, relativeToParent));
 				auto directory = parent.directory;
 				if (!traverser.fileExists(std::move(directory + relative)))
-					directory = Path({});
+					directory = Path(L"");
 
 				Vertex child{directory, relative};
 				nodesToVisit.push(std::move(child));
