@@ -1,5 +1,7 @@
 #pragma once
 
+#include "CommonTypes.h"
+
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/topological_sort.hpp>
@@ -14,10 +16,6 @@ namespace analyzer {
 	class DependencyGraph final
 	{
 	public:
-		using Path = std::wstring;
-
-		using RelativePath = Path;
-
 		class Vertex final
 		{
 		public:

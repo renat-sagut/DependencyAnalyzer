@@ -5,6 +5,7 @@
 #include <regex>
 #include <assert.h>
 #include <sstream>
+#include <algorithm>
 
 #include "boost/filesystem.hpp"
 namespace fs = boost::filesystem;
@@ -31,7 +32,7 @@ namespace analyzer {
 		return std::move(ss.str());
 	}
 
-	auto FileParser::parseIncludes(File const& file, IncludeList& bracketIncludes, IncludeList& quoteIncludes) const -> void
+	auto FileParser::parseIncludes(File const& file, RelativePathList& bracketIncludes, RelativePathList& quoteIncludes) const -> void
 	{
 		std::string parseFile = file;
 		removeComments(parseFile);
@@ -40,17 +41,17 @@ namespace analyzer {
 		parseIncludes(parseFile, IncludeType::QUOTES, quoteIncludes);
 	}
 
-	auto FileParser::parseIncludes(std::string const& file, IncludeType const includeType, IncludeList& includeList) const -> void
+	auto FileParser::parseIncludes(File const& file, IncludeType const includeType, RelativePathList& includeList) const -> void
 	{
 		auto includeStrings = std::move(findIncludeStrings(file, includeType));
 		for (auto const& includeString : includeStrings)
 		{
-			auto filePath = std::move(extractFilePath(includeString));
+			auto filePath = std::move(extractRelativePath(includeString));
 			includeList.push_back(std::move(filePath));
 		}
 	}
 
-	auto FileParser::findIncludeStrings(std::string const& inputString, IncludeType const includeType) const -> StringList
+	auto FileParser::findIncludeStrings(File const& file, IncludeType const includeType) const -> IncludeStringList
 	{
 		std::string const matchIncludesWithBrackets(R"(#include[[:space:]]*<.*?>)");
 		std::string const matchIncludesWithQuotes(R"(#include[[:space:]]*".*?")");
@@ -74,8 +75,8 @@ namespace analyzer {
 		}
 
 		std::smatch matchResult;
-		std::string searchString = inputString;
-		StringList result;
+		std::string searchString = file;
+		IncludeStringList result;
 		for (;;)
 		{
 			if (!std::regex_search(searchString, matchResult, regular))
@@ -90,7 +91,7 @@ namespace analyzer {
 
 	}
 
-	auto FileParser::extractFilePath(std::string const& includeString) const -> std::string
+	auto FileParser::extractRelativePath(IncludeString const& includeString) const -> RelativePath
 	{
 		std::string const matchFilePath(R"(\w\S*\.h)");
 
@@ -99,10 +100,14 @@ namespace analyzer {
 		if (!std::regex_search(includeString, matchResult, regular))
 			return {};
 
-		return std::move(matchResult[0]);
+		std::string s = std::move(matchResult[0]);
+		std::replace(s.begin(), s.end(), '/', '\\');
+
+		RelativePath result(s.begin(), s.end());
+		return std::move(L"\\" + result);
 	}
 
-	auto FileParser::removeComments(std::string& file) const -> void
+	auto FileParser::removeComments(File& file) const -> void
 	{
 		std::string matchComments(R"((/\*(.|[\r\n])*?\*/)|(//.*))");
 		file = std::regex_replace(file, std::regex(matchComments), "");

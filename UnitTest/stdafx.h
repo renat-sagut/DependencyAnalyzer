@@ -16,4 +16,13 @@ using analyzer::FileParser;
 #include "DirectoryTraverser.h"
 using analyzer::DirectoryTraverser;
 
+#include "CommonTypes.h"
+using analyzer::File;
+using analyzer::IncludeString;
+using analyzer::IncludeStringList;
+using analyzer::Path;
+using analyzer::PathList;
+using analyzer::RelativePath;
+using analyzer::RelativePathList;
+
 #include <string>

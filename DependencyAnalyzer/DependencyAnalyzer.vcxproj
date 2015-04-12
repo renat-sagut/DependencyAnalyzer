@@ -87,6 +87,7 @@
     <ClCompile Include="FileParser.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CommonTypes.h" />
     <ClInclude Include="DependencyAnalyzer.h" />
     <ClInclude Include="DependencyGraph.h" />
     <ClInclude Include="DirectoryTraverser.h" />

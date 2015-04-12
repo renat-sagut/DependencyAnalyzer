@@ -1,5 +1,7 @@
 #pragma once
 
+#include "CommonTypes.h"
+
 #include <vector>
 #include <string>
 
@@ -7,19 +9,13 @@ namespace analyzer {
 	class DirectoryTraverser final
 	{
 	public:
-		using Path = std::wstring;
-
-		using RelativePath = Path;
-
-		using PathList = std::vector<Path>;
-
 		DirectoryTraverser();
 
 		DirectoryTraverser(DirectoryTraverser const&) = delete;
 
 		auto operator =(DirectoryTraverser const&) -> DirectoryTraverser& = delete;
 
-		auto findSourceFiles(Path const& searchPath) const -> PathList;
+		auto findSourceFiles(Path const& searchPath) const -> RelativePathList;
 
 		auto findFileRelative(Path const& path, Path const& relative) const -> Path;
 

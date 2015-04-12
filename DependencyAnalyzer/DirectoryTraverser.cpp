@@ -9,7 +9,7 @@ namespace analyzer {
 
 	DirectoryTraverser::DirectoryTraverser() = default;
 
-	auto DirectoryTraverser::findSourceFiles(Path const& searchPath) const -> PathList
+	auto DirectoryTraverser::findSourceFiles(Path const& searchPath) const -> RelativePathList
 	{
 		fs::wpath p(searchPath);
 		std::wregex matchSource(LR"(.*\.cpp$)");

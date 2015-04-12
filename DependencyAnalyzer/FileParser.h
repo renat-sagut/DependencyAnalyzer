@@ -1,5 +1,7 @@
 #pragma once
 
+#include "CommonTypes.h"
+
 #include <vector>
 #include <string>
 
@@ -13,14 +15,6 @@ namespace analyzer {
 			QUOTES
 		};
 
-		using Path = std::wstring;
-
-		using File = std::string;
-
-		using IncludeList = std::vector<std::string>;
-
-		using StringList = std::vector<std::string>;
-
 		FileParser();
 
 		FileParser(FileParser const&) = delete;
@@ -29,15 +23,15 @@ namespace analyzer {
 
 		auto readFile(Path const& path) const -> File;
 
-		auto parseIncludes(std::string const& file, IncludeList& bracketIncludes, IncludeList& quoteIncludes) const -> void;
+		auto parseIncludes(File const& file, RelativePathList& bracketIncludes, RelativePathList& quoteIncludes) const -> void;
 
-		auto findIncludeStrings(std::string const& inputString, IncludeType const includeType) const -> StringList;
+		auto findIncludeStrings(File const& file, IncludeType const includeType) const -> IncludeStringList;
 
-		auto extractFilePath(std::string const& includeString) const -> std::string;
+		auto extractRelativePath(IncludeString const& includeString) const -> RelativePath;
 
-		auto removeComments(std::string& file) const -> void;
+		auto removeComments(File& file) const -> void;
 
-		auto parseIncludes(File const& file, IncludeType const includeType, IncludeList& includeList) const -> void;
+		auto parseIncludes(File const& file, IncludeType const includeType, RelativePathList& includeList) const -> void;
 
 	private:
 

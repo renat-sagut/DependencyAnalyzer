@@ -2,6 +2,7 @@
 
 #include "DependencyGraph.h"
 using analyzer::DependencyGraph;
+#include "CommonTypes.h"
 
 #include <iostream>
 #include <string>
@@ -12,12 +13,6 @@ namespace analyzer {
 	class DependencyAnalyzer final
 	{
 	public:
-		using File = std::string;
-
-		using Path = std::wstring;
-
-		using PathList = std::vector<Path>;
-
 		DependencyAnalyzer();
 
 		DependencyAnalyzer(DependencyAnalyzer const&) = delete;

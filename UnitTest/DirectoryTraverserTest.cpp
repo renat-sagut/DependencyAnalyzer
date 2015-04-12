@@ -10,7 +10,7 @@ namespace UnitTest
 	public:
 		TEST_METHOD(findSourceFiles)
 		{
-			DirectoryTraverser::PathList sourcesCorrect = {
+			RelativePathList sourcesCorrect = {
 				L"\\DependencyAnalyzer.cpp",
 				L"\\DependencyGraph.cpp",
 				L"\\DirectoryTraverser.cpp",

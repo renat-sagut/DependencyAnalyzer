@@ -23,7 +23,7 @@ namespace UnitTest
 
 		TEST_METHOD(parseIncludes)
 		{
-			std::string file(
+			File file(
 				"#include \"foo.h\"\n"
 				"#include <test/aa.h>\n"
 				"/*\n"
@@ -36,17 +36,17 @@ namespace UnitTest
 				"*/\n"
 			);
 
-			FileParser::IncludeList bracketIncludesCorrect = {
-				"test/aa.h",
-				"test/aa.h"
+			RelativePathList bracketIncludesCorrect = {
+				L"\\test\\aa.h",
+				L"\\test\\aa.h"
 			};
 
-			FileParser::IncludeList quoteIncludesCorrect = {
-				"foo.h"
+			RelativePathList quoteIncludesCorrect = {
+				L"\\foo.h"
 			};
 
 			FileParser parser;
-			FileParser::IncludeList bracketIncludesFound, quoteIncludesFound;
+			RelativePathList bracketIncludesFound, quoteIncludesFound;
 			parser.parseIncludes(file, bracketIncludesFound, quoteIncludesFound);
 
 			Assert::AreEqual(bracketIncludesFound.size(), bracketIncludesCorrect.size());
@@ -64,7 +64,7 @@ namespace UnitTest
 
 		TEST_METHOD(removeComments)
 		{
-			std::string fileWithComments(
+			File fileWithComments(
 				"#include \"foo.h\"\n"
 				"#include <test/aa.h>\n"
 				"/*\n"
@@ -77,7 +77,7 @@ namespace UnitTest
 				"*/\n"
 			);
 
-			std::string fileWithoutComments(
+			File fileWithoutComments(
 				"#include \"foo.h\"\n"
 				"#include <test/aa.h>\n\n\n"
 				"#include <test/aa.h>\n\n"
@@ -89,19 +89,19 @@ namespace UnitTest
 			Assert::AreEqual(fileToProcess, fileWithoutComments);
 		}
 
-		TEST_METHOD(extractFilePath)
+		TEST_METHOD(extractRelativePath)
 		{
-			std::string includeString("#include < sources/foo.h > ");
-			std::string filePathString("sources/foo.h");
+			IncludeString includeString("#include < sources/foo.h > ");
+			RelativePath filePathString(L"\\sources\\foo.h");
 
 			FileParser parser;
-			std::string result = std::move(parser.extractFilePath(includeString));
+			auto result = std::move(parser.extractRelativePath(includeString));
 			Assert::AreEqual(result, filePathString);
 		}
 
 		TEST_METHOD(findIncludeStrings)
 		{
-			std::string fileWithIncludes(
+			File fileWithIncludes(
 				"#include \"foo.h\"\n"
 				"#include <test/aa.h>\n"
 				"/*\n"
@@ -110,12 +110,12 @@ namespace UnitTest
 				"#include \"c.h\"\n"
 			);
 
-			FileParser::StringList bracketIncludesCorrect = {
+			IncludeStringList bracketIncludesCorrect = {
 				"#include <test/aa.h>",
 				"#include <c.h>"
 			};
 
-			FileParser::StringList quoteIncludesCorrect = {
+			IncludeStringList quoteIncludesCorrect = {
 				"#include \"foo.h\"",
 				"#include \"c.h\""
 			};

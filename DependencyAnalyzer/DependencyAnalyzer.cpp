@@ -42,15 +42,14 @@ namespace analyzer {
 			auto currentNode = std::move(nodesToVisit.front());
 			nodesToVisit.pop();
 
-			FileParser::Path path = std::move(currentNode.toString());
-			FileParser::File file = std::move(parser.readFile(path));
+			auto path = std::move(currentNode.toString());
+			auto file = std::move(parser.readFile(path));
 
-			FileParser::IncludeList quoteIncludes, bracketIncludes;
+			RelativePathList quoteIncludes, bracketIncludes;
 			parser.parseIncludes(file, bracketIncludes, quoteIncludes);
 
-			for (auto const& include : bracketIncludes)
+			for (auto const& relative : bracketIncludes)
 			{
-				DirectoryTraverser::RelativePath relative(include.begin(), include.end());
 				auto dir = std::move(traverser.findDirectoryWithFile(this->includeDirectories, relative));
 				
 				DependencyGraph::Vertex child{dir, relative};
@@ -59,13 +58,12 @@ namespace analyzer {
 					nodesToVisit.push(std::move(child));
 			}
 
-			for (auto const& include : quoteIncludes)
+			for (auto const& relativeToParent : quoteIncludes)
 			{
-				DirectoryTraverser::RelativePath relativeToParent(include.begin(), include.end());
 				auto relative = std::move(traverser.findRelativePath(currentNode.relative, relativeToParent));
 				auto directory = currentNode.directory;
 				if (!traverser.fileExists(std::move(directory + relative)))
-					directory = DependencyGraph::Path({});
+					directory = Path({});
 
 				DependencyGraph::Vertex child{directory, relative};
 				this->graph.addEdge(currentNode, child);

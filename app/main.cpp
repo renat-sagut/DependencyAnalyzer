@@ -46,8 +46,8 @@ int wmain(int argc, wchar_t* argv[])
 
 		po::notify(vm);
 
-		DependencyAnalyzer::Path sourceDirectory;
-		DependencyAnalyzer::PathList includeDirectories;
+		analyzer::Path sourceDirectory;
+		analyzer::PathList includeDirectories;
 
 		if (vm.count("source-path"))
 		{

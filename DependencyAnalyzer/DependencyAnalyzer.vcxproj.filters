@@ -47,5 +47,8 @@
     <ClInclude Include="DependencyAnalyzer.h">
       <Filter>Header Files\analyzer</Filter>
     </ClInclude>
+    <ClInclude Include="CommonTypes.h">
+      <Filter>Header Files\analyzer</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
