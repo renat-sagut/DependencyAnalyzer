@@ -5,6 +5,8 @@ using analyzer::DirectoryTraverser;
 #include "FileParser.h"
 using analyzer::FileParser;
 
+#include <queue>
+
 namespace analyzer {
 
 	DependencyAnalyzer::DependencyAnalyzer() = default;
@@ -19,20 +21,58 @@ namespace analyzer {
 
 	}
 
-	auto DependencyAnalyzer::update(Path const& source, PathList const& include) -> void
+	auto DependencyAnalyzer::update(Path const& sourceFolder, PathList const& includeFolders) -> void
 	{
-		this->sourceDirectory = source;
-		this->includeDirectories = include;
+		this->sourceDirectory = sourceFolder;
+		this->includeDirectories = includeFolders;
+		this->graph.reset();
 
 		FileParser parser;
 		DirectoryTraverser traverser;
-		auto const sourceFilePathList = std::move(traverser.findSourceFiles(this->sourceDirectory));
-		for (auto const& relative : sourceFilePathList)
+		auto const sourceList = std::move(traverser.findSourceFiles(this->sourceDirectory));
+
+		std::queue<DependencyGraph::Vertex> nodesToVisit;
+		for (auto const& source : sourceList)
 		{
-			Path path = std::move(source + relative);
-			File file = std::move(parser.readFile(path));
+			nodesToVisit.push({this->sourceDirectory, std::wstring(source.begin(), source.end())});
+		}
+
+		while (!nodesToVisit.empty())
+		{
+			auto currentNode = std::move(nodesToVisit.front());
+			nodesToVisit.pop();
+
+			FileParser::Path path = std::move(currentNode.toString());
+			FileParser::File file = std::move(parser.readFile(path));
+
 			FileParser::IncludeList quoteIncludes, bracketIncludes;
 			parser.parseIncludes(file, bracketIncludes, quoteIncludes);
+
+			for (auto const& include : bracketIncludes)
+			{
+				DirectoryTraverser::RelativePath relative(include.begin(), include.end());
+				auto dir = std::move(traverser.findDirectoryWithFile(this->includeDirectories, relative));
+				
+				DependencyGraph::Vertex child{dir, relative};
+				this->graph.addEdge(currentNode, child);
+				if (child.valid())
+					nodesToVisit.push(std::move(child));
+			}
+
+			for (auto const& include : quoteIncludes)
+			{
+				DirectoryTraverser::RelativePath relativeToParent(include.begin(), include.end());
+				auto relative = std::move(traverser.findRelativePath(currentNode.relative, relativeToParent));
+				auto directory = currentNode.directory;
+				if (!traverser.fileExists(std::move(directory + relative)))
+					directory = DependencyGraph::Path({});
+
+				DependencyGraph::Vertex child{directory, relative};
+				this->graph.addEdge(currentNode, child);
+				if (child.valid())
+					nodesToVisit.push(std::move(child));
+			}
+
 		}
 
 	}

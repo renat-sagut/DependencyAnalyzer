@@ -1,5 +1,8 @@
 #pragma once
 
+#include "DependencyGraph.h"
+using analyzer::DependencyGraph;
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -21,7 +24,7 @@ namespace analyzer {
 
 		auto operator =(DependencyAnalyzer const&) -> DependencyAnalyzer& = delete;
 
-		auto update(Path const& source, PathList const& include) -> void;
+		auto update(Path const& sourceFolder, PathList const& includeFolders) -> void;
 
 		auto printDependencyTree(std::ostream& out) -> void;
 
@@ -30,5 +33,6 @@ namespace analyzer {
 	private:
 		Path sourceDirectory;
 		PathList includeDirectories;
+		DependencyGraph graph;
 	};
 }
