@@ -13,5 +13,7 @@
 // TODO: reference additional headers your program requires here
 #include "FileParser.h"
 using analyzer::FileParser;
+#include "DirectoryTraverser.h"
+using analyzer::DirectoryTraverser;
 
 #include <string>

@@ -6,11 +6,32 @@
 #include <assert.h>
 #include <sstream>
 
+#include "boost/filesystem.hpp"
+namespace fs = boost::filesystem;
+#include <boost/iostreams/device/mapped_file.hpp>
+namespace io = boost::iostreams;
+
 namespace analyzer {
 
 	FileParser::FileParser() = default;
 
-	auto FileParser::parseIncludes(std::string const& file, IncludeList& bracketIncludes, IncludeList& quoteIncludes) const -> void
+	auto FileParser::readFile(Path const& path) const -> File
+	{
+		if (!fs::exists(path))
+			return {};
+
+		if (!fs::is_regular_file(path))
+			return {};
+
+		fs::wpath p(path);
+		io::mapped_file file(p);
+		std::stringstream ss;
+		ss << file.data();
+
+		return std::move(ss.str());
+	}
+
+	auto FileParser::parseIncludes(File const& file, IncludeList& bracketIncludes, IncludeList& quoteIncludes) const -> void
 	{
 		std::string parseFile = file;
 		removeComments(parseFile);

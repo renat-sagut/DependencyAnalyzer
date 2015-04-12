@@ -1,6 +1,7 @@
-#include <boost/program_options.hpp>
+#include "DependencyAnalyzer.h"
+using analyzer::DependencyAnalyzer;
 
-using namespace boost;
+#include <boost/program_options.hpp>
 namespace po = boost::program_options;
 
 #include <iostream>
@@ -11,6 +12,7 @@ namespace po = boost::program_options;
 #include <fcntl.h>
 
 using namespace std;
+using namespace boost;
 
 int wmain(int argc, wchar_t* argv[])
 {
@@ -44,8 +46,12 @@ int wmain(int argc, wchar_t* argv[])
 
 		po::notify(vm);
 
+		DependencyAnalyzer::Path sourceDirectory;
+		DependencyAnalyzer::PathList includeDirectories;
+
 		if (vm.count("source-path"))
 		{
+			sourceDirectory = vm["source-path"].as<wstring>();
 			wcout << L"Source path is: " << vm["source-path"].as<wstring>() << L"\n";
 		}
 
@@ -54,10 +60,17 @@ int wmain(int argc, wchar_t* argv[])
 			wcout << L"Include paths are: ";
 			for (auto const& path : vm["include-path"].as<vector<wstring>>())
 			{
+				includeDirectories.push_back(path);
 				wcout << path << L" ";
 			}
 			wcout << L"\n";
 		}
+
+		DependencyAnalyzer analyzer;
+		analyzer.update(sourceDirectory, includeDirectories);
+
+		analyzer.printDependencyTree(cout);
+		analyzer.printIncludeFrequencies(cout);
 	}
 	catch (std::exception& e)
 	{

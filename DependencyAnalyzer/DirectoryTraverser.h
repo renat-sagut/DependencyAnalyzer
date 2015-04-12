@@ -7,15 +7,17 @@ namespace analyzer {
 	class DirectoryTraverser final
 	{
 	public:
-		using FilePathList = std::vector<std::string>;
+		using Path = std::wstring;
+
+		using PathList = std::vector<Path>;
 
 		DirectoryTraverser();
 
 		DirectoryTraverser(DirectoryTraverser const&) = delete;
 
-		auto operator =(DirectoryTraverser const&) ->DirectoryTraverser& = delete;
+		auto operator =(DirectoryTraverser const&) -> DirectoryTraverser& = delete;
 
-		auto findSourceFiles() const -> FilePathList;
+		auto findSourceFiles(Path const& searchPath) const -> PathList;
 	private:
 	};
 }

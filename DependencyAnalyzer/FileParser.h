@@ -13,6 +13,10 @@ namespace analyzer {
 			QUOTES
 		};
 
+		using Path = std::wstring;
+
+		using File = std::string;
+
 		using IncludeList = std::vector<std::string>;
 
 		using StringList = std::vector<std::string>;
@@ -23,6 +27,8 @@ namespace analyzer {
 
 		auto operator =(FileParser const&) -> FileParser& = delete;
 
+		auto readFile(Path const& path) const -> File;
+
 		auto parseIncludes(std::string const& file, IncludeList& bracketIncludes, IncludeList& quoteIncludes) const -> void;
 
 		auto findIncludeStrings(std::string const& inputString, IncludeType const includeType) const -> StringList;
@@ -31,7 +37,7 @@ namespace analyzer {
 
 		auto removeComments(std::string& file) const -> void;
 
-		auto parseIncludes(std::string const& file, IncludeType const includeType, IncludeList& includeList) const -> void;
+		auto parseIncludes(File const& file, IncludeType const includeType, IncludeList& includeList) const -> void;
 
 	private:
 

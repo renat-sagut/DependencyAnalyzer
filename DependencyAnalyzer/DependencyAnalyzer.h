@@ -9,9 +9,11 @@ namespace analyzer {
 	class DependencyAnalyzer final
 	{
 	public:
-		using DirectoryPath = std::wstring;
+		using File = std::string;
 
-		using DirectoryPathList = std::vector<DirectoryPath>;
+		using Path = std::wstring;
+
+		using PathList = std::vector<Path>;
 
 		DependencyAnalyzer();
 
@@ -19,11 +21,14 @@ namespace analyzer {
 
 		auto operator =(DependencyAnalyzer const&) -> DependencyAnalyzer& = delete;
 
-		auto update(DirectoryPath const& source, DirectoryPathList const& include) -> void;
+		auto update(Path const& source, PathList const& include) -> void;
 
 		auto printDependencyTree(std::ostream& out) -> void;
 
 		auto printIncludeFrequencies(std::ostream& out) -> void;
+
 	private:
+		Path sourceDirectory;
+		PathList includeDirectories;
 	};
 }

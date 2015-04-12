@@ -8,6 +8,19 @@ namespace UnitTest
 	TEST_CLASS(FileParserTest)
 	{
 	public:
+		TEST_METHOD(readFile)
+		{
+			std::string fileCorrect(
+				"first\r\n"
+				"second\r\n"
+				"third"
+			);
+
+			FileParser parser;
+			auto const file = std::move(parser.readFile(L"..\\UnitTest\\ReadFileTest.txt"));
+			Assert::AreEqual(file, fileCorrect);
+		}
+
 		TEST_METHOD(parseIncludes)
 		{
 			std::string file(
