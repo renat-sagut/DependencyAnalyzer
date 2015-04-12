@@ -12,7 +12,6 @@ namespace UnitTest
 		{
 			RelativePathList sourcesCorrect = {
 				L"\\DependencyAnalyzer.cpp",
-				L"\\DependencyGraph.cpp",
 				L"\\DirectoryTraverser.cpp",
 				L"\\FileParser.cpp"
 			};

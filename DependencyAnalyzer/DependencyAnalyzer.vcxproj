@@ -82,14 +82,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="DependencyAnalyzer.cpp" />
-    <ClCompile Include="DependencyGraph.cpp" />
     <ClCompile Include="DirectoryTraverser.cpp" />
     <ClCompile Include="FileParser.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CommonTypes.h" />
     <ClInclude Include="DependencyAnalyzer.h" />
-    <ClInclude Include="DependencyGraph.h" />
     <ClInclude Include="DirectoryTraverser.h" />
     <ClInclude Include="FileParser.h" />
   </ItemGroup>

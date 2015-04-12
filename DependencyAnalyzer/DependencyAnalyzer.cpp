@@ -6,8 +6,45 @@ using analyzer::DirectoryTraverser;
 using analyzer::FileParser;
 
 #include <queue>
+#include <map>
 
 namespace analyzer {
+
+	auto DependencyAnalyzer::Vertex::operator =(Vertex const& v)->Vertex&
+	{
+		this->directory = v.directory;
+		this->relative = v.relative;
+	}
+
+	auto DependencyAnalyzer::Vertex::operator ==(Vertex const& v) const -> bool
+	{
+		return toString() == v.toString();
+	}
+
+	auto DependencyAnalyzer::Vertex::operator <(Vertex const& v) const -> bool
+	{
+		return toString() < v.toString();
+	}
+
+	auto DependencyAnalyzer::Vertex::toString() const -> std::wstring
+	{
+		return std::move(this->directory + this->relative);
+	}
+
+	auto DependencyAnalyzer::Vertex::valid() const -> bool
+	{
+		if (this->directory.length() == 0)
+			return false;
+
+		if (this->relative.length() == 0)
+			return false;
+
+		DirectoryTraverser traverser;
+		if (!traverser.fileExists(toString()))
+			return false;
+
+		return true;
+	}
 
 	DependencyAnalyzer::DependencyAnalyzer() = default;
 
@@ -25,24 +62,37 @@ namespace analyzer {
 	{
 		this->sourceDirectory = sourceFolder;
 		this->includeDirectories = includeFolders;
-		this->graph.reset();
+		this->graph.clear();
 
 		FileParser parser;
 		DirectoryTraverser traverser;
 		auto const sourceList = std::move(traverser.findSourceFiles(this->sourceDirectory));
 
-		std::queue<DependencyGraph::Vertex> nodesToVisit;
+		std::queue<Vertex> nodesToVisit;
 		for (auto const& source : sourceList)
 		{
 			nodesToVisit.push({this->sourceDirectory, std::wstring(source.begin(), source.end())});
 		}
 
+		std::map<Vertex, VertexDescriptor> visitedNodes;
+		std::map<Edge, int> edges;
 		while (!nodesToVisit.empty())
 		{
-			auto currentNode = std::move(nodesToVisit.front());
+			auto parent = std::move(nodesToVisit.front());
 			nodesToVisit.pop();
+			if (visitedNodes.find(parent) == visitedNodes.end())
+			{
+				auto parentDescriptor = boost::add_vertex(this->graph);
+				this->graph[parentDescriptor] = parent;
+				visitedNodes[parent] = parentDescriptor;
+			}
+			else
+				continue;
 
-			auto path = std::move(currentNode.toString());
+			if (!parent.valid())
+				continue;
+
+			auto path = std::move(parent.toString());
 			auto file = std::move(parser.readFile(path));
 
 			RelativePathList quoteIncludes, bracketIncludes;
@@ -52,25 +102,38 @@ namespace analyzer {
 			{
 				auto dir = std::move(traverser.findDirectoryWithFile(this->includeDirectories, relative));
 				
-				DependencyGraph::Vertex child{dir, relative};
-				this->graph.addEdge(currentNode, child);
-				if (child.valid())
-					nodesToVisit.push(std::move(child));
+				Vertex child{dir, relative};
+				nodesToVisit.push(std::move(child));
+
+				Edge edge{parent, child};
+				if (edges.find(edge) == edges.end())
+					edges[edge] = 1;
 			}
 
 			for (auto const& relativeToParent : quoteIncludes)
 			{
-				auto relative = std::move(traverser.findRelativePath(currentNode.relative, relativeToParent));
-				auto directory = currentNode.directory;
+				auto relative = std::move(traverser.findRelativePath(parent.relative, relativeToParent));
+				auto directory = parent.directory;
 				if (!traverser.fileExists(std::move(directory + relative)))
 					directory = Path({});
 
-				DependencyGraph::Vertex child{directory, relative};
-				this->graph.addEdge(currentNode, child);
-				if (child.valid())
-					nodesToVisit.push(std::move(child));
+				Vertex child{directory, relative};
+				nodesToVisit.push(std::move(child));
+
+				Edge edge{parent, child};
+				if (edges.find(edge) == edges.end())
+					edges[edge] = 1;
+
 			}
 
+		}
+
+		for (auto const& edgeKeyValue : edges)
+		{
+			auto const& edge = edgeKeyValue.first;
+			auto const& vertexDescriptorFirst = visitedNodes[edge.first];
+			auto const& vertexDescriptorSecond = visitedNodes[edge.second];
+			boost::add_edge(vertexDescriptorFirst, vertexDescriptorSecond, this->graph);
 		}
 
 	}

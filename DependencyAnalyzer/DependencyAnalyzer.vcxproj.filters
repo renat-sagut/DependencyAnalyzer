@@ -21,9 +21,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="DependencyGraph.cpp">
-      <Filter>Source Files\analyzer</Filter>
-    </ClCompile>
     <ClCompile Include="FileParser.cpp">
       <Filter>Source Files\analyzer</Filter>
     </ClCompile>
@@ -35,9 +32,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="DependencyGraph.h">
-      <Filter>Header Files\analyzer</Filter>
-    </ClInclude>
     <ClInclude Include="FileParser.h">
       <Filter>Header Files\analyzer</Filter>
     </ClInclude>

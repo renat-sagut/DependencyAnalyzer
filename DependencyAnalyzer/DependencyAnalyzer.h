@@ -1,18 +1,42 @@
 #pragma once
 
-#include "DependencyGraph.h"
-using analyzer::DependencyGraph;
 #include "CommonTypes.h"
 
 #include <iostream>
 #include <string>
 #include <vector>
+#include <map>
+
+#include <boost/graph/adjacency_list.hpp>
 
 namespace analyzer {
 
 	class DependencyAnalyzer final
 	{
 	public:
+		class Vertex final
+		{
+		public:
+			auto operator =(Vertex const& v) -> Vertex&;
+
+			auto operator ==(Vertex const& v) const -> bool;
+
+			auto operator <(Vertex const& v) const -> bool;
+
+			auto toString() const->std::wstring;
+
+			auto valid() const -> bool;
+
+			Path directory;
+			RelativePath relative;
+		};
+
+		using Edge = std::pair<Vertex, Vertex>;
+
+		using Graph = boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS, Vertex>;
+
+		using VertexDescriptor = boost::graph_traits<Graph>::vertex_descriptor;
+
 		DependencyAnalyzer();
 
 		DependencyAnalyzer(DependencyAnalyzer const&) = delete;
@@ -28,6 +52,6 @@ namespace analyzer {
 	private:
 		Path sourceDirectory;
 		PathList includeDirectories;
-		DependencyGraph graph;
+		Graph graph;
 	};
 }
