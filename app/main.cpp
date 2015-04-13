@@ -63,7 +63,7 @@ int wmain(int argc, wchar_t* argv[])
 				includeDirectories.push_back(path);
 				wcout << path << L" ";
 			}
-			wcout << L"\n";
+			wcout << L"\n\n";
 		}
 
 		DependencyAnalyzer analyzer;

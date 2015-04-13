@@ -21,7 +21,10 @@ namespace analyzer {
 		this->level += 1;
 		for (int i = 0; i < level; ++i)
 			this->wout << L"..";
-		this->wout << g[u].relative << std::endl;
+		this->wout << g[u].relative;
+		if (!g[u].valid())
+			this->wout << L" (!)";
+		this->wout << std::endl;
 	}
 
 	template <typename TVertex, typename TGraph>
