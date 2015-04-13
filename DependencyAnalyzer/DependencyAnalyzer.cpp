@@ -168,14 +168,18 @@ namespace analyzer {
 		}
 	}
 
-	auto DependencyAnalyzer::update(Path const& sourceFolder, PathList const& includeFolders) -> void
+	auto DependencyAnalyzer::update(Path const& sourceDirectory, PathList const& includeDirectories) -> void
 	{
-		this->sourceDirectory = sourceFolder;
-		this->includeDirectories = includeFolders;
-		this->graph.clear();
-		this->sourceDescriptors.clear();
-
 		DirectoryTraverser traverser;
+		this->sourceDirectory = std::move(traverser.normalizePath(sourceDirectory));
+		this->includeDirectories.clear();
+		for (auto const& includeDirectory : includeDirectories)
+		{
+			this->includeDirectories.push_back(std::move(traverser.normalizePath(includeDirectory)));
+		}
+		this->graph.clear();
+		this->sourceDescriptors.clear();	
+
 		auto const sourceList = std::move(traverser.findSourceFiles(this->sourceDirectory));
 
 		if (sourceList.empty())

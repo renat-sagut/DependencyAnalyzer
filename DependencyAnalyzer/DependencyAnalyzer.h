@@ -80,7 +80,7 @@ namespace analyzer {
 
 		auto operator =(DependencyAnalyzer const&) -> DependencyAnalyzer& = delete;
 
-		auto update(Path const& sourceFolder, PathList const& includeFolders) -> void;
+		auto update(Path const& sourceDirectory, PathList const& includeDirectories) -> void;
 
 		auto printDependencyTree(std::wostream& out) -> void;
 

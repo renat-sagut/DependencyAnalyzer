@@ -1,6 +1,7 @@
 #include "DirectoryTraverser.h"
 
 #include <regex>
+#include <sstream>
 
 #include <boost/filesystem.hpp>
 namespace fs = boost::filesystem;
@@ -71,4 +72,16 @@ namespace analyzer {
 		return {};
 	}
 
+	auto DirectoryTraverser::normalizePath(Path const& path) const -> Path
+	{
+		std::wstringstream ss;
+		for (auto iter = path.begin(); iter != path.end(); ++iter)
+		{
+			if (*iter == L'/')
+				ss << L'\\';
+			else
+				ss << *iter;
+		}
+		return std::move(std::regex_replace(ss.str(), std::wregex(LR"(\\$)"), L""));
+	}
 }

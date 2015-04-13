@@ -22,6 +22,8 @@ namespace analyzer {
 		auto findDirectoryWithFile(PathList const& dirs, RelativePath const& relative) const -> Path;
 
 		auto findRelativePath(RelativePath const& parent, RelativePath const& child) const -> RelativePath;
+
+		auto normalizePath(Path const& path) const -> Path;
 	private:
 	};
 }
