@@ -5,12 +5,30 @@ using analyzer::DirectoryTraverser;
 #include "FileParser.h"
 using analyzer::FileParser;
 
-#include <boost/graph/topological_sort.hpp>
-
 #include <queue>
 #include <map>
 
 namespace analyzer {
+
+	DependencyAnalyzer::PrintTree::PrintTree(std::wostream& a_wout)
+		: wout{a_wout}
+	{
+	}
+
+	template <typename TVertex, typename TGraph>
+	auto DependencyAnalyzer::PrintTree::discover_vertex(TVertex u, TGraph& g) -> void
+	{
+		this->level += 1;
+		for (int i = 0; i < level; ++i)
+			this->wout << L"..";
+		this->wout << g[u].relative << std::endl;
+	}
+
+	template <typename TVertex, typename TGraph>
+	auto DependencyAnalyzer::PrintTree::finish_vertex(TVertex u, TGraph& g) -> void
+	{
+		this->level -= 1;
+	}
 
 	auto DependencyAnalyzer::Vertex::operator =(Vertex const& v) -> Vertex&
 	{
@@ -54,13 +72,8 @@ namespace analyzer {
 
 	auto DependencyAnalyzer::printDependencyTree(std::wostream& out) -> void
 	{
-		std::list<VertexDescriptor> ordered;
-		boost::topological_sort(this->graph, std::front_inserter(ordered));
-
-		for (auto const v : ordered)
-		{
-			out << this->graph[v].toString() << std::endl;
-		}
+		PrintTree printTree(out);
+		boost::depth_first_search(this->graph, boost::visitor(printTree));
 	}
 
 	auto DependencyAnalyzer::printIncludeFrequencies(std::wostream& out) -> void
