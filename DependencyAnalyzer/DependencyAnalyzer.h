@@ -54,6 +54,10 @@ namespace analyzer {
 
 		using VertexDescriptor = boost::graph_traits<Graph>::vertex_descriptor;
 
+		using EdgeDescriptor = boost::graph_traits<Graph>::edge_descriptor;
+
+		using SourceVertexDescriptors = std::vector<VertexDescriptor>;
+
 		DependencyAnalyzer();
 
 		DependencyAnalyzer(DependencyAnalyzer const&) = delete;
@@ -70,5 +74,6 @@ namespace analyzer {
 		Path sourceDirectory;
 		PathList includeDirectories;
 		Graph graph;
+		SourceVertexDescriptors sourceDescriptors;
 	};
 }

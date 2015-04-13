@@ -5,7 +5,7 @@ using analyzer::DirectoryTraverser;
 #include "FileParser.h"
 using analyzer::FileParser;
 
-#include <queue>
+#include <deque>
 #include <map>
 
 namespace analyzer {
@@ -19,6 +19,7 @@ namespace analyzer {
 	auto DependencyAnalyzer::PrintTree::discover_vertex(TVertex u, TGraph& g) -> void
 	{
 		this->level += 1;
+
 		for (int i = 0; i < level; ++i)
 			this->wout << L"..";
 		this->wout << g[u].relative;
@@ -75,8 +76,36 @@ namespace analyzer {
 
 	auto DependencyAnalyzer::printDependencyTree(std::wostream& out) -> void
 	{
-		PrintTree printTree(out);
-		boost::depth_first_search(this->graph, boost::visitor(printTree));
+		//PrintTree printTree(out);
+		//boost::depth_first_search(this->graph, boost::visitor(printTree));
+
+		std::deque<std::pair<VertexDescriptor, int>> nodesToVisit;
+		for (auto const& desc : this->sourceDescriptors)
+		{
+			nodesToVisit.push_back({desc, 0});
+		}
+
+		while (!nodesToVisit.empty())
+		{
+			auto const descLevel = nodesToVisit.front();
+			nodesToVisit.pop_front();
+
+			auto const desc = descLevel.first;
+			auto const level = descLevel.second;
+			for (int i = 0; i < level; ++i)
+				out << L"..";
+			out << this->graph[desc].relative;
+			if (!this->graph[desc].valid())
+				out << L" (!)";
+			out << std::endl;
+
+			Graph::adjacency_iterator iter, end;
+			boost::tie(iter, end) = boost::adjacent_vertices(desc, this->graph);
+			for (; iter != end; ++iter)
+			{
+				nodesToVisit.push_front({*iter, level + 1});
+			}
+		}
 	}
 
 	auto DependencyAnalyzer::printIncludeFrequencies(std::wostream& out) -> void
@@ -89,6 +118,7 @@ namespace analyzer {
 		this->sourceDirectory = sourceFolder;
 		this->includeDirectories = includeFolders;
 		this->graph.clear();
+		this->sourceDescriptors.clear();
 
 		FileParser parser;
 		DirectoryTraverser traverser;
@@ -97,18 +127,33 @@ namespace analyzer {
 		if (sourceList.empty())
 			return;
 
-		std::queue<Vertex> nodesToVisit;
+		std::vector<Vertex> sourceVertexList;
 		for (auto const& source : sourceList)
 		{
-			nodesToVisit.push({this->sourceDirectory, std::wstring(source.begin(), source.end())});
+			sourceVertexList.push_back({this->sourceDirectory, std::wstring(source.begin(), source.end())});
+		}
+
+		std::deque<Vertex> nodesToVisit;
+		for (auto const& sourceVertex : sourceVertexList)
+		{
+			nodesToVisit.push_back(sourceVertex);
+		}
+
+		std::map<Edge, int> edges;
+		Vertex dummyVertex{this->sourceDirectory, L""};
+		auto dummyDescriptor = boost::add_vertex(this->graph);
+		this->graph[dummyDescriptor] = dummyVertex;
+		for (auto const& sourceVertex : nodesToVisit)
+		{
+			Edge edge{dummyVertex, sourceVertex};
+			edges[edge] = 1;
 		}
 
 		std::map<Vertex, VertexDescriptor> visitedNodes;
-		std::map<Edge, int> edges;
 		while (!nodesToVisit.empty())
 		{
 			auto parent = std::move(nodesToVisit.front());
-			nodesToVisit.pop();
+			nodesToVisit.pop_front();
 			if (visitedNodes.find(parent) == visitedNodes.end())
 			{
 				auto parentDescriptor = boost::add_vertex(this->graph);
@@ -132,7 +177,7 @@ namespace analyzer {
 				auto dir = std::move(traverser.findDirectoryWithFile(this->includeDirectories, relative));
 				
 				Vertex child{dir, relative};
-				nodesToVisit.push(std::move(child));
+				nodesToVisit.push_back(std::move(child));
 
 				Edge edge{parent, child};
 				if (edges.find(edge) == edges.end())
@@ -147,7 +192,7 @@ namespace analyzer {
 					directory = Path(L"");
 
 				Vertex child{directory, relative};
-				nodesToVisit.push(std::move(child));
+				nodesToVisit.push_back(std::move(child));
 
 				Edge edge{parent, child};
 				if (edges.find(edge) == edges.end())
@@ -157,12 +202,21 @@ namespace analyzer {
 
 		}
 
+		for (auto const& sourceVertex : sourceVertexList)
+		{
+			if (visitedNodes.find(sourceVertex) != visitedNodes.end())
+				this->sourceDescriptors.push_back(visitedNodes[sourceVertex]);
+		}
+
 		for (auto const& edgeKeyValue : edges)
 		{
 			auto const& edge = edgeKeyValue.first;
 			auto const& vertexDescriptorFirst = visitedNodes[edge.first];
 			auto const& vertexDescriptorSecond = visitedNodes[edge.second];
-			boost::add_edge(vertexDescriptorFirst, vertexDescriptorSecond, this->graph);
+
+			EdgeDescriptor desc;
+			bool added;
+			boost::tie(desc, added) = boost::add_edge(vertexDescriptorFirst, vertexDescriptorSecond, this->graph);
 		}
 
 	}
