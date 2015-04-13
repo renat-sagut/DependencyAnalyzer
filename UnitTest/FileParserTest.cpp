@@ -34,6 +34,7 @@ namespace UnitTest
 				"/*\n"
 				"#include <c.h>\n"
 				"*/\n"
+				"\"#include <bar.h>\n\""
 			);
 
 			RelativePathList bracketIncludesCorrect = {

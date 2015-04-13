@@ -94,6 +94,9 @@ namespace analyzer {
 		DirectoryTraverser traverser;
 		auto const sourceList = std::move(traverser.findSourceFiles(this->sourceDirectory));
 
+		if (sourceList.empty())
+			return;
+
 		std::queue<Vertex> nodesToVisit;
 		for (auto const& source : sourceList)
 		{

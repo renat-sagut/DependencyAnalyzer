@@ -14,18 +14,25 @@ namespace analyzer {
 		fs::wpath p(searchPath);
 		std::wregex matchSource(LR"(.*\.cpp$)");
 		PathList result;
-		for (fs::recursive_directory_iterator iter(p), end; iter != end; ++iter)
+		try
 		{
-			auto const& currentPath = iter->path();
-			if (!fs::is_regular_file(currentPath))
-				continue;
-			auto const name = std::move(currentPath.leaf().wstring());
-			if (std::regex_match(name, matchSource))
+			for (fs::recursive_directory_iterator iter(p), end; iter != end; ++iter)
 			{
-				auto s = std::move(currentPath.wstring());
-				auto relative = std::move(s.erase(s.find(searchPath), searchPath.length()));
-				result.push_back(std::move(relative));
+				auto const& currentPath = iter->path();
+				if (!fs::is_regular_file(currentPath))
+					continue;
+				auto const name = std::move(currentPath.leaf().wstring());
+				if (std::regex_match(name, matchSource))
+				{
+					auto s = std::move(currentPath.wstring());
+					auto relative = std::move(s.erase(s.find(searchPath), searchPath.length()));
+					result.push_back(std::move(relative));
+				}
 			}
+		}
+		catch (boost::filesystem::filesystem_error& e)
+		{
+			return {};
 		}
 
 		return std::move(result);

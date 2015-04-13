@@ -53,8 +53,8 @@ namespace analyzer {
 
 	auto FileParser::findIncludeStrings(File const& file, IncludeType const includeType) const -> IncludeStringList
 	{
-		std::string const matchIncludesWithBrackets(R"(#include[[:space:]]*<.*?>)");
-		std::string const matchIncludesWithQuotes(R"(#include[[:space:]]*".*?")");
+		std::string const matchIncludesWithBrackets(R"(^\s*?#include[[:space:]]*<.*?\.h>)");
+		std::string const matchIncludesWithQuotes(R"(^\s*?#include[[:space:]]*".*?\.h")");
 
 		std::regex regular;
 
