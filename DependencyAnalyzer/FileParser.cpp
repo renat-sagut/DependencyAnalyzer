@@ -53,8 +53,8 @@ namespace analyzer {
 
 	auto FileParser::findIncludeStrings(File const& file, IncludeType const includeType) const -> IncludeStringList
 	{
-		std::string const matchIncludesWithBrackets(R"(^\s*?#include[[:space:]]*<.*?\.h>)");
-		std::string const matchIncludesWithQuotes(R"(^\s*?#include[[:space:]]*".*?\.h")");
+		std::string const matchIncludesWithBrackets(R"(^\s*?#include\s*?<.*?\.h>)");
+		std::string const matchIncludesWithQuotes(R"(^\s*?#include\s*?".*?\.h")");
 
 		std::regex regular;
 
@@ -93,14 +93,15 @@ namespace analyzer {
 
 	auto FileParser::extractRelativePath(IncludeString const& includeString) const -> RelativePath
 	{
-		std::string const matchFilePath(R"(\w\S*\.h)");
+		std::string const matchFilePath(R"((["|<]\s*)(\S*)(\s*["|>]))");
 
 		std::smatch matchResult;
 		std::regex regular(matchFilePath);
 		if (!std::regex_search(includeString, matchResult, regular))
 			return {};
 
-		std::string s = std::move(matchResult[0]);
+		//std::string s = std::move(matchResult[0]);
+		std::string s(matchResult[2].first, matchResult[2].second);
 		std::replace(s.begin(), s.end(), '/', '\\');
 
 		RelativePath result(s.begin(), s.end());

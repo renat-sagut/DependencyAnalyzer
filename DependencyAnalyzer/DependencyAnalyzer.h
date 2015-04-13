@@ -32,6 +32,18 @@ namespace analyzer {
 			RelativePath relative;
 		};
 
+		using Edge = std::pair<Vertex, Vertex>;
+
+		using Graph = boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS, Vertex>;
+
+		using VertexDescriptor = boost::graph_traits<Graph>::vertex_descriptor;
+
+		using EdgeDescriptor = boost::graph_traits<Graph>::edge_descriptor;
+
+		using VertexDescriptors = std::vector<VertexDescriptor>;
+
+		using SourceVertexDescriptors = VertexDescriptors;
+
 		class PrintTree : public boost::default_dfs_visitor
 		{
 		public:
@@ -48,15 +60,17 @@ namespace analyzer {
 			int level = -1;
 		};
 
-		using Edge = std::pair<Vertex, Vertex>;
+		class CycleDetector : public boost::default_dfs_visitor
+		{
+		public:
+			CycleDetector(VertexDescriptors& descriptors);
 
-		using Graph = boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS, Vertex>;
+			template <typename TEdge, typename TGraph>
+			auto back_edge(TEdge e, TGraph& g) -> void;
 
-		using VertexDescriptor = boost::graph_traits<Graph>::vertex_descriptor;
-
-		using EdgeDescriptor = boost::graph_traits<Graph>::edge_descriptor;
-
-		using SourceVertexDescriptors = std::vector<VertexDescriptor>;
+		private:
+			VertexDescriptors& descriptors;
+		};
 
 		DependencyAnalyzer();
 

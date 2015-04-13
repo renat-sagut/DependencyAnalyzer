@@ -34,6 +34,21 @@ namespace analyzer {
 		this->level -= 1;
 	}
 
+	DependencyAnalyzer::CycleDetector::CycleDetector(VertexDescriptors& a_descriptors)
+		: descriptors{a_descriptors}
+	{
+		descriptors.clear();
+	}
+
+	template <typename TEdge, typename TGraph>
+	auto DependencyAnalyzer::CycleDetector::back_edge(TEdge u, TGraph& g) -> void
+	{
+		auto const s = boost::source(u, g);
+		auto const t = boost::target(u, g);
+
+		this->descriptors.push_back(s);
+	}
+
 	auto DependencyAnalyzer::Vertex::operator =(Vertex const& v) -> Vertex&
 	{
 		this->directory = v.directory;
@@ -78,6 +93,21 @@ namespace analyzer {
 	{
 		//PrintTree printTree(out);
 		//boost::depth_first_search(this->graph, boost::visitor(printTree));
+
+		VertexDescriptors descriptors;
+		CycleDetector cycleDetector(descriptors);
+		boost::depth_first_search(this->graph, boost::visitor(cycleDetector));
+
+		if (!descriptors.empty())
+		{
+			out << L"Cyclic dependencies detected in:\n";
+			for (auto const& desc : descriptors)
+			{
+				out << this->graph[desc].relative << std::endl;
+			}
+
+			return;
+		}
 
 		std::deque<std::pair<VertexDescriptor, int>> nodesToVisit;
 		for (auto const& desc : this->sourceDescriptors)

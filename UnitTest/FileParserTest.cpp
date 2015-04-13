@@ -34,16 +34,22 @@ namespace UnitTest
 				"/*\n"
 				"#include <c.h>\n"
 				"*/\n"
-				"\"#include <bar.h>\n\""
+				"\"#include <bar.h>\n\"\n"
+				"#include <1.h>\n"
+				"#include \"2.h\"\n"
+				"#include\"3.h\""
 			);
 
 			RelativePathList bracketIncludesCorrect = {
 				L"\\test\\aa.h",
-				L"\\test\\aa.h"
+				L"\\test\\aa.h",
+				L"\\1.h"
 			};
 
 			RelativePathList quoteIncludesCorrect = {
-				L"\\foo.h"
+				L"\\foo.h",
+				L"\\2.h",
+				L"\\3.h"
 			};
 
 			FileParser parser;
