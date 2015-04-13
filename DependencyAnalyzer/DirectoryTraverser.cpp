@@ -38,31 +38,6 @@ namespace analyzer {
 		return std::move(result);
 	}
 
-	auto DirectoryTraverser::findFileRelative(Path const& path, Path const& relative) const -> Path
-	{
-		fs::wpath p(path + relative);
-
-		if (!fs::exists(p))
-			return {};
-
-		if (!fs::is_regular_file(p))
-			return {};
-
-		return std::move(p.wstring());
-	}
-
-	auto DirectoryTraverser::findFileInFolders(PathList const& pathList, Path const& relative) const -> Path
-	{
-		for (auto const& path : pathList)
-		{
-			auto const p = std::move(findFileRelative(path, relative));
-			if (p.length() > 0)
-				return std::move(p);
-		}
-
-		return {};
-	}
-
 	auto DirectoryTraverser::fileExists(Path const& path) const -> bool
 	{
 		fs::path p(path);

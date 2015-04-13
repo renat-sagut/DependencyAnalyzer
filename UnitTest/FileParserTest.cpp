@@ -37,13 +37,15 @@ namespace UnitTest
 				"\"#include <bar.h>\n\"\n"
 				"#include <1.h>\n"
 				"#include \"2.h\"\n"
-				"#include\"3.h\""
+				"#include\"3.h\"\n"
+				"#include <boost/program_options.hpp>"
 			);
 
 			RelativePathList bracketIncludesCorrect = {
 				L"\\test\\aa.h",
 				L"\\test\\aa.h",
-				L"\\1.h"
+				L"\\1.h",
+				L"\\boost\\program_options.hpp"
 			};
 
 			RelativePathList quoteIncludesCorrect = {

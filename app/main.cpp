@@ -70,6 +70,7 @@ int wmain(int argc, wchar_t* argv[])
 		analyzer.update(sourceDirectory, includeDirectories);
 
 		analyzer.printDependencyTree(wcout);
+		wcout << std::endl;
 		analyzer.printIncludeFrequencies(wcout);
 	}
 	catch (std::exception& e)

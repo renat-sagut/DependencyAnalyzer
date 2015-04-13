@@ -24,7 +24,9 @@ namespace analyzer {
 
 			auto operator <(Vertex const& v) const -> bool;
 
-			auto toString() const->std::wstring;
+			auto toString() const -> std::wstring;
+
+			auto toStringRelative() const -> std::wstring;
 
 			auto valid() const -> bool;
 
@@ -34,7 +36,7 @@ namespace analyzer {
 
 		using Edge = std::pair<Vertex, Vertex>;
 
-		using Graph = boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS, Vertex>;
+		using Graph = boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, Vertex>;
 
 		using VertexDescriptor = boost::graph_traits<Graph>::vertex_descriptor;
 

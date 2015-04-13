@@ -53,8 +53,8 @@ namespace analyzer {
 
 	auto FileParser::findIncludeStrings(File const& file, IncludeType const includeType) const -> IncludeStringList
 	{
-		std::string const matchIncludesWithBrackets(R"(^\s*?#include\s*?<.*?\.h>)");
-		std::string const matchIncludesWithQuotes(R"(^\s*?#include\s*?".*?\.h")");
+		std::string const matchIncludesWithBrackets(R"(^\s*?#include\s*?<.*?\.hp{0,2}>)");
+		std::string const matchIncludesWithQuotes(R"(^\s*?#include\s*?".*?\.hp{0,2}")");
 
 		std::regex regular;
 
@@ -110,8 +110,15 @@ namespace analyzer {
 
 	auto FileParser::removeComments(File& file) const -> void
 	{
-		std::string matchComments(R"((/\*(.|[\r\n])*?\*/)|(//.*))");
-		file = std::regex_replace(file, std::regex(matchComments), "");
+		try
+		{
+			std::string matchComments(R"((/\*(.|[\r\n])*?\*/)|(//.*))");
+			file = std::regex_replace(file, std::regex(matchComments), "");
+		}
+		catch (std::regex_error& e)
+		{
+			file = { "" };
+		}
 	}
 
 }

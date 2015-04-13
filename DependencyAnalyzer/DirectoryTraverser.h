@@ -17,10 +17,6 @@ namespace analyzer {
 
 		auto findSourceFiles(Path const& searchPath) const -> RelativePathList;
 
-		auto findFileRelative(Path const& path, Path const& relative) const -> Path;
-
-		auto findFileInFolders(PathList const& pathList, Path const& relative) const -> Path;
-
 		auto fileExists(Path const& path) const -> bool;
 
 		auto findDirectoryWithFile(PathList const& dirs, RelativePath const& relative) const -> Path;

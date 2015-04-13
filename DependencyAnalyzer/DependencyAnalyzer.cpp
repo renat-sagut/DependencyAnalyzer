@@ -72,6 +72,14 @@ namespace analyzer {
 		return std::move(this->directory + this->relative);
 	}
 
+	auto DependencyAnalyzer::Vertex::toStringRelative() const -> std::wstring
+	{
+		if (this->relative.size() > 0)
+			return std::move(this->relative.substr(1, this->relative.size() - 1));
+
+		return { L"" };
+	}
+
 	auto DependencyAnalyzer::Vertex::valid() const -> bool
 	{
 		if (this->directory.length() == 0)
@@ -103,7 +111,7 @@ namespace analyzer {
 			out << L"Cyclic dependencies detected in:\n";
 			for (auto const& desc : descriptors)
 			{
-				out << this->graph[desc].relative << std::endl;
+				out << this->graph[desc].toStringRelative() << std::endl;
 			}
 
 			return;
@@ -124,7 +132,7 @@ namespace analyzer {
 			auto const level = descLevel.second;
 			for (int i = 0; i < level; ++i)
 				out << L"..";
-			out << this->graph[desc].relative;
+			out << this->graph[desc].toStringRelative();
 			if (!this->graph[desc].valid())
 				out << L" (!)";
 			out << std::endl;
@@ -144,7 +152,7 @@ namespace analyzer {
 		using VertexFrequencies = std::vector<VertexFrequency>;
 		VertexFrequencies frequencies;
 		auto frequencyCalculator = [this, &frequencies](VertexDescriptor const& v) -> void {
-			frequencies.push_back({v, boost::out_degree(v, this->graph)});
+			frequencies.push_back({v, boost::in_degree(v, this->graph)});
 		};
 		std::for_each(boost::vertices(this->graph).first, boost::vertices(this->graph).second, frequencyCalculator);
 		auto greater = [](VertexFrequency const& a, VertexFrequency const& b) -> bool {
@@ -155,7 +163,7 @@ namespace analyzer {
 		{
 			auto v = vertexFrequency.first;
 			auto f = vertexFrequency.second;
-			out << this->graph[v].relative << L" : " << f;
+			out << this->graph[v].toStringRelative() << L" : " << f;
 			out << std::endl;
 		}
 	}
@@ -167,7 +175,6 @@ namespace analyzer {
 		this->graph.clear();
 		this->sourceDescriptors.clear();
 
-		FileParser parser;
 		DirectoryTraverser traverser;
 		auto const sourceList = std::move(traverser.findSourceFiles(this->sourceDirectory));
 
@@ -186,16 +193,8 @@ namespace analyzer {
 			nodesToVisit.push_back(sourceVertex);
 		}
 
+		FileParser parser;
 		std::map<Edge, int> edges;
-		Vertex dummyVertex{this->sourceDirectory, L""};
-		auto dummyDescriptor = boost::add_vertex(this->graph);
-		this->graph[dummyDescriptor] = dummyVertex;
-		for (auto const& sourceVertex : nodesToVisit)
-		{
-			Edge edge{dummyVertex, sourceVertex};
-			edges[edge] = 1;
-		}
-
 		std::map<Vertex, VertexDescriptor> visitedNodes;
 		while (!nodesToVisit.empty())
 		{
