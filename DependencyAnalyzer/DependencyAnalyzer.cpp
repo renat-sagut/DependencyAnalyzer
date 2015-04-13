@@ -140,7 +140,24 @@ namespace analyzer {
 
 	auto DependencyAnalyzer::printIncludeFrequencies(std::wostream& out) -> void
 	{
-
+		using VertexFrequency = std::pair<VertexDescriptor, int>;
+		using VertexFrequencies = std::vector<VertexFrequency>;
+		VertexFrequencies frequencies;
+		auto frequencyCalculator = [this, &frequencies](VertexDescriptor const& v) -> void {
+			frequencies.push_back({v, boost::out_degree(v, this->graph)});
+		};
+		std::for_each(boost::vertices(this->graph).first, boost::vertices(this->graph).second, frequencyCalculator);
+		auto greater = [](VertexFrequency const& a, VertexFrequency const& b) -> bool {
+			return a.second > b.second;
+		};
+		std::sort(frequencies.begin(), frequencies.end(), greater);
+		for (auto vertexFrequency : frequencies)
+		{
+			auto v = vertexFrequency.first;
+			auto f = vertexFrequency.second;
+			out << this->graph[v].relative << L" : " << f;
+			out << std::endl;
+		}
 	}
 
 	auto DependencyAnalyzer::update(Path const& sourceFolder, PathList const& includeFolders) -> void
